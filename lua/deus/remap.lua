@@ -22,6 +22,7 @@ vim.keymap.set("n", "<leader>x", "<cmd>!chmod +x %<CR>", { silent = true })
 
 vim.keymap.set("n", "<leader>rp", ":w <bar> exec '!python %'<CR>")
 vim.keymap.set("n", "<leader>b", ":w <bar> exec '!clang % -o %:r'<CR>")
+vim.keymap.set("n", "<leader>ts", ":w <bar> exec '!tsx %'<CR>")
 
 -- lsp
 --
