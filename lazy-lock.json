@@ -14,6 +14,7 @@
   "nvim-treesitter": { "branch": "master", "commit": "707313b80a2f1e65fa06dba2052cc49ce6762a60" },
   "plenary.nvim": { "branch": "master", "commit": "2d9b06177a975543726ce5c73fca176cedbffe9d" },
   "telescope.nvim": { "branch": "master", "commit": "cb3f98d935842836cc115e8c9e4b38c1380fbb6b" },
+  "tokyonight": { "branch": "main", "commit": "ce91ba480070c95f40753e4663e32b4632ac6db3" },
   "undotree": { "branch": "master", "commit": "78b5241191852ffa9bb5da5ff2ee033160798c3b" },
   "zen-mode.nvim": { "branch": "main", "commit": "78557d972b4bfbb7488e17b5703d25164ae64e6a" }
 }
