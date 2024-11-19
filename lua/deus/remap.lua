@@ -14,6 +14,7 @@ vim.keymap.set("n", "n", "nzzzv")
 vim.keymap.set("n", "N", "Nzzzv")
 
 vim.keymap.set("n", "<leader>f", vim.lsp.buf.format)
+vim.keymap.set("n", "<leader>cc", ":cclose<CR>", { noremap = true, silent = true })
 
 vim.keymap.set("n", "<C-k>", "<cmd>cnext<CR>zz")
 vim.keymap.set("n", "<C-j>", "<cmd>cprev<CR>zz")
@@ -31,4 +32,3 @@ vim.keymap.set("n", "<leader>ts", ":w <bar> exec '!tsx %'<CR>")
 -- lsp
 --
 vim.keymap.set("n", "<leader>f", vim.lsp.buf.format)
-
