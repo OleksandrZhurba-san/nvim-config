@@ -16,13 +16,29 @@ return {
   config = function()
     local cmp = require('cmp')
     local cmp_lsp = require("cmp_nvim_lsp")
+    local lspconfig = require("lspconfig")
     local capabilities = vim.tbl_deep_extend(
       "force",
       {},
       vim.lsp.protocol.make_client_capabilities(),
       cmp_lsp.default_capabilities())
 
+    lspconfig.sourcekit.setup(
+      {
+        cmd = { "xcrun", "sourcekit-lsp" },
+        filetypes = { "swift", "objective-c", "objective-cpp" },
+        root_dir = lspconfig.util.root_pattern("package.swift", ".git", "*.swift"),
+        capabilities = {
+          workspace = {
+            didchangewatchedfiles = {
+              dynamicregistration = true,
+            },
+          },
+        },
+      }
+    )
     require("fidget").setup({})
+    -- mason setup
     require("mason").setup()
     require("mason-lspconfig").setup({
       ensure_installed = {
@@ -32,14 +48,13 @@ return {
         "clangd"
       },
       handlers = {
-        function(server_name)         -- default handler (optional)
+        function(server_name) -- default handler (optional)
           require("lspconfig")[server_name].setup {
             capabilities = capabilities
           }
         end,
 
         zls = function()
-          local lspconfig = require("lspconfig")
           lspconfig.zls.setup({
             root_dir = lspconfig.util.root_pattern(".git", "build.zig", "zls.json"),
             settings = {
@@ -54,7 +69,6 @@ return {
           vim.g.zig_fmt_autosave = 0
         end,
         ["lua_ls"] = function()
-          local lspconfig = require("lspconfig")
           lspconfig.lua_ls.setup {
             capabilities = capabilities,
             settings = {
@@ -68,24 +82,30 @@ return {
           }
         end,
         ["clangd"] = function()
-          local lspconfig = require("lspconfig")
           lspconfig.clangd.setup({
             capabilities = capabilities,
-            cmd = { "clangd", "--header-insertion=never" },         -- Clangd options
+            cmd = { "clangd", "--header-insertion=never" }, -- Clangd options
             filetypes = { "c", "cpp", "objc", "objcpp" },
             root_dir = lspconfig.util.root_pattern(".clangd", "compile_commands.json", ".git", "Makefile"),
           })
         end,
-
       }
     })
 
     local cmp_select = { behavior = cmp.SelectBehavior.Select }
 
     cmp.setup({
+      window = {
+        completion = {
+          max_height = 20,
+        },
+        documentation = {
+          max_height = 20,
+        },
+      },
       snippet = {
         expand = function(args)
-          require('luasnip').lsp_expand(args.body)           -- For `luasnip` users.
+          require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
         end,
       },
       mapping = cmp.mapping.preset.insert({
@@ -96,7 +116,7 @@ return {
       }),
       sources = cmp.config.sources({
         { name = 'nvim_lsp' },
-        { name = 'luasnip' },         -- For luasnip users.
+        { name = 'luasnip' }, -- For luasnip users.
       }, {
         { name = 'buffer' },
       })
@@ -125,6 +145,5 @@ return {
       max_width = 120,
       max_height = 58
     })
-
-  end
+  end,
 }
