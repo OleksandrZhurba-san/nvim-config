@@ -46,7 +46,6 @@ return {
         "rust_analyzer",
         "gopls",
         "clangd",
---        "tsserver"
       },
       handlers = {
         function(server_name) -- default handler (optional)
@@ -86,7 +85,7 @@ return {
           lspconfig.clangd.setup({
             capabilities = capabilities,
             cmd = { "clangd", "--header-insertion=never" }, -- Clangd options
-            filetypes = { "c", "cpp", "objc", "objcpp" },
+            filetypes = { "c", "cpp", "objc", "objcpp", "ino" },
             root_dir = lspconfig.util.root_pattern(".clangd", "compile_commands.json", ".git", "Makefile"),
           })
         end,
@@ -121,6 +120,25 @@ return {
         ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
         ['<CR>'] = cmp.mapping.confirm({ select = true }),
         ["<C-Space>"] = cmp.mapping.complete(),
+        ['<Tab>'] = cmp.mapping(function(fallback)
+          if cmp.visible() then
+            cmp.select_next_item()
+          elseif require('luasnip').expand_or_jumpable() then
+            require('luasnip').expand_or_jump()
+          else
+            fallback()
+          end
+        end, { 'i', 's' }),
+
+        ['<S-Tab>'] = cmp.mapping(function(fallback)
+          if cmp.visible() then
+            cmp.select_prev_item()
+          elseif require('luasnip').jumpable(-1) then
+            require('luasnip').jump(-1)
+          else
+            fallback()
+          end
+        end, { 'i', 's' }),
       }),
       sources = cmp.config.sources({
         { name = 'nvim_lsp' },
