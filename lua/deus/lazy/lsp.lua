@@ -46,6 +46,7 @@ return {
         "rust_analyzer",
         "gopls",
         "clangd",
+        "ts_ls"
       },
       handlers = {
         function(server_name) -- default handler (optional)
@@ -89,13 +90,20 @@ return {
             root_dir = lspconfig.util.root_pattern(".clangd", "compile_commands.json", ".git", "Makefile"),
           })
         end,
-        --["tsserver"] = function()
-        --  lspconfig.tsserver.setup({
-        --    capabilities = capabilities,
-        --    filetypes = { "javascript", "javascriptreact", "javascript.jsx", "typescript", "typescriptreact", "typescript.tsx" },
-        --    root_dir = lspconfig.util.root_pattern("package.json", "tsconfig.json", "jsconfig.json", ".git"),
-        --  })
-        --end,
+        ["ts_ls"] = function()
+          lspconfig.ts_ls.setup({
+            capabilities = capabilities,
+            filetypes = {
+              "javascript",
+              "javascriptreact",
+              "javascript.jsx",
+              "typescript",
+              "typescriptreact",
+              "typescript.tsx" },
+            root_dir = lspconfig.util.root_pattern("package.json", "tsconfig.json", "jsconfig.json", ".git"),
+            single_file_support = true,
+          })
+        end,
       }
     })
 
