@@ -1,5 +1,5 @@
 function ColorMyPencils(color)
-  color = color or "catppuccin"
+  color = color or "tokyonight"
   vim.cmd.colorscheme(color)
 
   -- Style only the float windows (like LSP hovers)
@@ -27,15 +27,15 @@ end
 
 return {
   {
-    "catppuccin/nvim",
-    name = "catppuccin",
-    --"folke/tokyonight.nvim",
-    --name = "tokyonight",
+    --"catppuccin/nvim",
+    --name = "catppuccin",
+    "folke/tokyonight.nvim",
+    name = "tokyonight",
     --"ellisonleao/gruvbox.nvim",
     --name = "gruvbox",
     priority = 1000,
     config = function()
-      require("catppuccin").setup({
+      require("tokyonight").setup({
         opt = {
           bold = false,
           italic = {
