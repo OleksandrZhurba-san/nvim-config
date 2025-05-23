@@ -86,7 +86,7 @@ return {
           lspconfig.clangd.setup({
             capabilities = capabilities,
             cmd = { "clangd", "--header-insertion=never" }, -- Clangd options
-            filetypes = { "c", "cpp", "objc", "objcpp", "ino" },
+            filetypes = { "c", "cpp", "objc", "ino" },
             root_dir = lspconfig.util.root_pattern(".clangd", "compile_commands.json", ".git", "Makefile"),
           })
         end,

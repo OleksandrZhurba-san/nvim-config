@@ -10,6 +10,7 @@ local deusGroup = augroup('deus', {})
 vim.filetype.add({
   extension = {
     ino = "cpp",
+    mm = "objc"
   }
 })
 
