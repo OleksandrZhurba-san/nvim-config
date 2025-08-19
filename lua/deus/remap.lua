@@ -65,7 +65,6 @@ vim.keymap.set("n", "<leader>q", ":cclose<CR>", { desc = "Close quickfix" })
 vim.keymap.set("n", "<leader>ts", ":w <bar> exec '!tsx %'<CR>")
 vim.keymap.set("n", "<leader>m", ":w <bar> exec '!make'<CR>")
 vim.keymap.set("n", "<leader>mr", ":w <bar> exec '!make run'<CR>")
-<<<<<<< HEAD
 vim.keymap.set("n", "<leader>q", ":q<CR>", { desc = "Close window" })
 
 -- lsp
