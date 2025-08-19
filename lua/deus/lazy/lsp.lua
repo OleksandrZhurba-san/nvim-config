@@ -46,7 +46,8 @@ return {
         "rust_analyzer",
         "gopls",
         "clangd",
-        "ts_ls"
+        "ts_ls",
+        "jsonls"
       },
       handlers = {
         function(server_name) -- default handler (optional)
@@ -102,6 +103,17 @@ return {
               "typescript.tsx" },
             root_dir = lspconfig.util.root_pattern("package.json", "tsconfig.json", "jsconfig.json", ".git"),
             single_file_support = true,
+          })
+        end,
+        ["jsonls"] = function()
+          lspconfig.jsonls.setup({
+            capabilities = capabilities,
+            filetypes = { "json", "jsonc" }, -- include jsonc explicitly
+            settings = {
+              json = {
+                validate = { enable = true },
+              },
+            },
           })
         end,
       }

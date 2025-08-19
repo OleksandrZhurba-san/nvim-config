@@ -20,7 +20,7 @@ vim.keymap.set("n", "<C-j>", "<cmd>cprev<CR>zz")
 vim.keymap.set("n", "<leader>k", "<cmd>lnext<CR>zz")
 vim.keymap.set("n", "<leader>j", "<cmd>lprev<CR>zz")
 
-vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
+-- vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
 vim.keymap.set("n", "<leader>x", "<cmd>!chmod +x %<CR>", { silent = true })
 
 -- compiler stuff
@@ -65,6 +65,7 @@ vim.keymap.set("n", "<leader>q", ":cclose<CR>", { desc = "Close quickfix" })
 vim.keymap.set("n", "<leader>ts", ":w <bar> exec '!tsx %'<CR>")
 vim.keymap.set("n", "<leader>m", ":w <bar> exec '!make'<CR>")
 vim.keymap.set("n", "<leader>mr", ":w <bar> exec '!make run'<CR>")
+<<<<<<< HEAD
 vim.keymap.set("n", "<leader>q", ":q<CR>", { desc = "Close window" })
 
 -- lsp
@@ -98,3 +99,8 @@ vim.keymap.set('n', '<leader>fe', function()
 end)
 
 vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "LSP Code Action" })
+-- lsp
+--
+vim.keymap.set("n", "<leader>f", vim.lsp.buf.format)
+vim.keymap.set("n", "<leader>s", vim.lsp.buf.rename)
+vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = "Show diagnostic float" })
