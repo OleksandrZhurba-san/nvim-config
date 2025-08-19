@@ -1,18 +1,18 @@
 function ColorMyPencils(color)
-  color = color or "lunaperche"
+  color = color or "kanagawa"
   vim.cmd.colorscheme(color)
 
   -- Style only the float windows (like LSP hovers)
-  --vim.api.nvim_set_hl(0, "NormalFloat", { bg = "#1e1e2e", fg = "#cdd6f4" })
-  --vim.api.nvim_set_hl(0, "FloatBorder", { bg = "#1e1e2e", fg = "#f38ba8" })
+  vim.api.nvim_set_hl(1, "NormalFloat", { bg = "#1e1e2e", fg = "#cdd6f4" })
+  vim.api.nvim_set_hl(1, "FloatBorder", { bg = "#1e1e2e", fg = "#f38ba8" })
 
   -- Ensure main UI is transparent
-  --[[ vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
-  vim.api.nvim_set_hl(0, "NormalNC", { bg = "none" })
-  vim.api.nvim_set_hl(0, "SignColumn", { bg = "none" })
-  vim.api.nvim_set_hl(0, "VertSplit", { bg = "none" })
-  vim.api.nvim_set_hl(0, "StatusLine", { bg = "none" }) ]]
-  --
+  vim.api.nvim_set_hl(1, "Normal", { bg = "none" })
+  vim.api.nvim_set_hl(1, "NormalNC", { bg = "none" })
+  vim.api.nvim_set_hl(1, "SignColumn", { bg = "none" })
+  vim.api.nvim_set_hl(1, "VertSplit", { bg = "none" })
+  vim.api.nvim_set_hl(1, "StatusLine", { bg = "none" })
+
   -- Add borders to LSP hover and signature help
   vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
     vim.lsp.handlers.hover,
@@ -27,21 +27,25 @@ end
 
 return {
   {
-    --"catppuccin/nvim",
-    --name = "catppuccin",
-    "folke/tokyonight.nvim",
-    name = "tokyonight",
+    -- "folke/tokyonight.nvim",
+    -- name = "tokyonight",
     --"ellisonleao/gruvbox.nvim",
     --name = "gruvbox",
+    "rebelot/kanagawa.nvim",
+    name = "kanagawa",
     priority = 1000,
     config = function()
-      require("tokyonight").setup({
+      require("kanagawa").setup({
+        compile = true,
+        commentStyle = { italic = false },
+        theme = "dragon",
+        --[[ contrast = "hard",
         opt = {
           bold = false,
           italic = {
             strings = false,
           }
-        }
+        } ]]
       })
       ColorMyPencils()
     end,

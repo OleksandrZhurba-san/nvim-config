@@ -15,7 +15,16 @@ return {
           "%.bin$",
           "%.o$",
           "%.svg$",
-        }
+          "%.exe$",
+          "%.obj$",
+          "%.pdb$",
+          "%.lib$",
+          "%.dll$",
+          "^bin/",
+        },
+        preview = {
+          treesitter = false,
+        },
       }
     })
     local builtin = require('telescope.builtin')
