@@ -47,7 +47,8 @@ return {
         "gopls",
         "clangd",
         "ts_ls",
-        "jsonls"
+        "jsonls",
+        "zls"
       },
       handlers = {
         function(server_name) -- default handler (optional)
