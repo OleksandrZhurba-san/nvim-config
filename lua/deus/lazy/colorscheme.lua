@@ -7,11 +7,11 @@ function ColorMyPencils(color)
   vim.api.nvim_set_hl(1, "FloatBorder", { bg = "#1e1e2e", fg = "#f38ba8" })
 
   -- Ensure main UI is transparent
-  vim.api.nvim_set_hl(1, "Normal", { bg = "none" })
+  --[[ vim.api.nvim_set_hl(1, "Normal", { bg = "none" })
   vim.api.nvim_set_hl(1, "NormalNC", { bg = "none" })
   vim.api.nvim_set_hl(1, "SignColumn", { bg = "none" })
   vim.api.nvim_set_hl(1, "VertSplit", { bg = "none" })
-  vim.api.nvim_set_hl(1, "StatusLine", { bg = "none" })
+  vim.api.nvim_set_hl(1, "StatusLine", { bg = "none" }) ]]
 
   -- Add borders to LSP hover and signature help
   vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
