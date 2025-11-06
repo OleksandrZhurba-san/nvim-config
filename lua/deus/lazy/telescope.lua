@@ -21,6 +21,9 @@ return {
           "%.lib$",
           "%.dll$",
           "^bin/",
+          "%.jpg$",
+          "%.jpeg$",
+          "%.png$",
         },
         preview = {
           treesitter = false,
