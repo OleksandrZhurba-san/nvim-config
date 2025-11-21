@@ -48,8 +48,7 @@ return {
         "clangd",
         "ts_ls",
         "jsonls",
-        "zls",
-        "volar"
+        "zls"
       },
       handlers = {
         function(server_name) -- default handler (optional)
