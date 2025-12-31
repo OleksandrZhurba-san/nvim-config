@@ -1,5 +1,5 @@
 function ColorMyPencils(color)
-  color = color or "kanagawa"
+  color = color or "adwaita"
   vim.cmd.colorscheme(color)
 
   -- Style only the float windows (like LSP hovers)
@@ -25,29 +25,16 @@ function ColorMyPencils(color)
   )
 end
 
-return {
+return {}
+--[[ return {
   {
-    -- "folke/tokyonight.nvim",
-    -- name = "tokyonight",
-    --"ellisonleao/gruvbox.nvim",
-    --name = "gruvbox",
-    "rebelot/kanagawa.nvim",
-    name = "kanagawa",
+    "Mofiqul/adwaita.nvim",
+    lazy = false,
+    name = "adwaita",
     priority = 1000,
     config = function()
-      require("kanagawa").setup({
-        compile = true,
-        commentStyle = { italic = false },
-        theme = "dragon",
-        --[[ contrast = "hard",
-        opt = {
-          bold = false,
-          italic = {
-            strings = false,
-          }
-        } ]]
-      })
+      vim.g.adwaita_darker = true
       ColorMyPencils()
     end,
   },
-}
+} ]]

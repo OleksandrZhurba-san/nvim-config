@@ -81,10 +81,10 @@ end, { desc = "LSP: Rename symbol (empty input)" })
 
 
 -- Ctrl+Shift+C to copy (yank)
-vim.keymap.set({ "n", "v" }, "<C-S-c>", '"+y', { desc = "Copy to system clipboard" })
+vim.keymap.set({ "x", "n", "i" }, "<M-c>", '"+y', { desc = "Copy to system clipboard" })
 
 -- Ctrl+Shift+V to paste (put)
-vim.keymap.set({ "n", "i", "c" }, "<C-S-v>", '"+p', { desc = "Paste from system clipboard" })
+vim.keymap.set({ "x", "n", "i" }, "<M-v>", '"+p', { desc = "Paste from system clipboard" })
 
 vim.keymap.set('n', 'gr', vim.lsp.buf.references, { desc = 'Go to references' })
 

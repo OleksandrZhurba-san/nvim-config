@@ -14,31 +14,65 @@ return {
   },
 
   config = function()
-    local cmp = require('cmp')
+    local cmp = require("cmp")
     local cmp_lsp = require("cmp_nvim_lsp")
-    local lspconfig = require("lspconfig")
+
+    -- ===== capabilities =====
     local capabilities = vim.tbl_deep_extend(
       "force",
       {},
       vim.lsp.protocol.make_client_capabilities(),
-      cmp_lsp.default_capabilities())
-
-    lspconfig.sourcekit.setup(
-      {
-        cmd = { "xcrun", "sourcekit-lsp" },
-        filetypes = { "swift", "objective-c", "objective-cpp" },
-        root_dir = lspconfig.util.root_pattern("package.swift", ".git", "*.swift"),
-        capabilities = {
-          workspace = {
-            didchangewatchedfiles = {
-              dynamicregistration = true,
-            },
-          },
-        },
-      }
+      cmp_lsp.default_capabilities()
     )
+
+    -- ===== format on save =====
+    local augroup = vim.api.nvim_create_augroup("LspFormatOnSave", { clear = true })
+
+    local on_attach = function(client, bufnr)
+      if client.supports_method("textDocument/formatting") then
+        vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
+        vim.api.nvim_create_autocmd("BufWritePre", {
+          group = augroup,
+          buffer = bufnr,
+          callback = function()
+            vim.lsp.buf.format({
+              bufnr = bufnr,
+              async = false,
+              timeout_ms = 2000,
+            })
+          end,
+        })
+      end
+    end
+    -- ==========================
+
+    -- ===== filetypes: treat .vs/.fs as GLSL =====
+    vim.filetype.add({
+      extension = {
+        vs = "glsl",
+        fs = "glsl",
+        vert = "glsl",
+        frag = "glsl",
+        comp = "glsl",
+        geom = "glsl",
+        tesc = "glsl",
+        tese = "glsl",
+      },
+    })
+
+    -- ===== root_dir helper (replacement for lspconfig.util.root_pattern) =====
+    local function root_pattern(...)
+      local patterns = { ... }
+      return function(fname)
+        local path = vim.fs.dirname(fname)
+        local found = vim.fs.find(patterns, { path = path, upward = true })[1]
+        return found and vim.fs.dirname(found) or vim.loop.cwd()
+      end
+    end
+
     require("fidget").setup({})
-    -- mason setup
+
+    -- ===== mason =====
     require("mason").setup()
     require("mason-lspconfig").setup({
       ensure_installed = {
@@ -48,131 +82,174 @@ return {
         "clangd",
         "ts_ls",
         "jsonls",
-        "zls"
+        "zls",
+        "glsl_analyzer",
       },
-      handlers = {
-        function(server_name) -- default handler (optional)
-          require("lspconfig")[server_name].setup {
-            capabilities = capabilities
-          }
-        end,
-
-        zls = function()
-          lspconfig.zls.setup({
-            root_dir = lspconfig.util.root_pattern(".git", "build.zig", "zls.json"),
-            settings = {
-              zls = {
-                enable_inlay_hints = true,
-                enable_snippets = true,
-                warn_style = true,
-              },
-            },
-          })
-          vim.g.zig_fmt_parse_errors = 0
-          vim.g.zig_fmt_autosave = 0
-        end,
-        ["lua_ls"] = function()
-          lspconfig.lua_ls.setup {
-            capabilities = capabilities,
-            settings = {
-              Lua = {
-                runtime = { version = "Lua 5.1" },
-                diagnostics = {
-                  globals = { "bit", "vim", "it", "describe", "before_each", "after_each" },
-                }
-              }
-            }
-          }
-        end,
-        ["clangd"] = function()
-          lspconfig.clangd.setup({
-            capabilities = capabilities,
-            cmd = { "clangd", "--header-insertion=never" }, -- Clangd options
-            filetypes = { "c", "cpp", "objc", "ino" },
-            root_dir = lspconfig.util.root_pattern(".clangd", "compile_commands.json", ".git", "Makefile"),
-          })
-        end,
-        ["ts_ls"] = function()
-          lspconfig.ts_ls.setup({
-            capabilities = capabilities,
-            filetypes = {
-              "javascript",
-              "javascriptreact",
-              "javascript.jsx",
-              "typescript",
-              "typescriptreact",
-              "typescript.tsx" },
-            root_dir = lspconfig.util.root_pattern("package.json", "tsconfig.json", "jsconfig.json", ".git"),
-            single_file_support = true,
-          })
-        end,
-        ["jsonls"] = function()
-          lspconfig.jsonls.setup({
-            capabilities = capabilities,
-            filetypes = { "json", "jsonc" }, -- include jsonc explicitly
-            settings = {
-              json = {
-                validate = { enable = true },
-              },
-            },
-          })
-        end,
-      }
     })
 
+    -- ===== per-server configs (Neovim 0.11+ native) =====
+
+    -- sourcekit (Swift) - not managed by mason usually, but we can still configure+enable it
+    vim.lsp.config("sourcekit", {
+      cmd = { "xcrun", "sourcekit-lsp" },
+      filetypes = { "swift", "objective-c", "objective-cpp" },
+      root_dir = root_pattern("Package.swift", ".git"),
+      capabilities = capabilities,
+      on_attach = on_attach,
+    })
+    vim.lsp.enable("sourcekit")
+
+    -- default config for most mason servers
+    local default = {
+      capabilities = capabilities,
+      on_attach = on_attach,
+    }
+
+    -- Configure defaults for servers you didn't override below:
+    local mason_servers = {
+      "lua_ls",
+      "rust_analyzer",
+      "gopls",
+      "clangd",
+      "ts_ls",
+      "jsonls",
+      "zls",
+      "glsl_analyzer",
+    }
+
+    for _, name in ipairs(mason_servers) do
+      vim.lsp.config(name, default)
+    end
+
+    -- zls override
+    vim.lsp.config("zls", {
+      capabilities = capabilities,
+      on_attach = on_attach,
+      root_dir = root_pattern(".git", "build.zig", "zls.json"),
+      settings = {
+        zls = {
+          enable_inlay_hints = true,
+          enable_snippets = true,
+          warn_style = true,
+        },
+      },
+    })
+    vim.g.zig_fmt_parse_errors = 0
+    vim.g.zig_fmt_autosave = 0
+
+    -- lua_ls override
+    vim.lsp.config("lua_ls", {
+      capabilities = capabilities,
+      on_attach = on_attach,
+      settings = {
+        Lua = {
+          runtime = { version = "Lua 5.1" },
+          diagnostics = {
+            globals = { "bit", "vim", "it", "describe", "before_each", "after_each" },
+          },
+        },
+      },
+    })
+
+    -- clangd override
+    vim.lsp.config("clangd", {
+      capabilities = capabilities,
+      on_attach = on_attach,
+      cmd = { "clangd", "--header-insertion=never" },
+      filetypes = { "c", "cpp", "objc", "ino" },
+      root_dir = root_pattern(".clangd", "compile_commands.json", ".git", "Makefile"),
+    })
+
+    -- ts_ls override
+    vim.lsp.config("ts_ls", {
+      capabilities = capabilities,
+      on_attach = on_attach,
+      filetypes = {
+        "javascript",
+        "javascriptreact",
+        "javascript.jsx",
+        "typescript",
+        "typescriptreact",
+        "typescript.tsx",
+      },
+      root_dir = root_pattern("package.json", "tsconfig.json", "jsconfig.json", ".git"),
+      single_file_support = true,
+    })
+
+    -- jsonls override
+    vim.lsp.config("jsonls", {
+      capabilities = capabilities,
+      on_attach = on_attach,
+      filetypes = { "json", "jsonc" },
+      settings = {
+        json = {
+          validate = { enable = true },
+        },
+      },
+    })
+
+    -- glsl_analyzer (you can add settings later; this is enough to attach)
+    vim.lsp.config("glsl_analyzer", {
+      capabilities = capabilities,
+      on_attach = on_attach,
+      filetypes = { "glsl" },
+    })
+
+    -- finally enable all mason-managed servers
+    for _, name in ipairs(mason_servers) do
+      vim.lsp.enable(name)
+    end
+
+    -- ===== cmp (unchanged) =====
     local cmp_select = { behavior = cmp.SelectBehavior.Select }
 
     cmp.setup({
       window = {
-        completion = {
-          max_height = 20,
-        },
-        documentation = {
-          max_height = 20,
-        },
+        completion = { max_height = 20 },
+        documentation = { max_height = 20 },
       },
       snippet = {
         expand = function(args)
-          require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
+          require("luasnip").lsp_expand(args.body)
         end,
       },
       mapping = cmp.mapping.preset.insert({
-        ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
-        ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
-        ['<CR>'] = cmp.mapping.confirm({ select = true }),
+        ["<C-p>"] = cmp.mapping.select_prev_item(cmp_select),
+        ["<C-n>"] = cmp.mapping.select_next_item(cmp_select),
+        ["<CR>"] = cmp.mapping.confirm({ select = true }),
         ["<C-Space>"] = cmp.mapping.complete(),
-        ['<Tab>'] = cmp.mapping(function(fallback)
+        ["<Tab>"] = cmp.mapping(function(fallback)
           if cmp.visible() then
             cmp.select_next_item()
-          elseif require('luasnip').expand_or_jumpable() then
-            require('luasnip').expand_or_jump()
+          elseif require("luasnip").expand_or_jumpable() then
+            require("luasnip").expand_or_jump()
           else
             fallback()
           end
-        end, { 'i', 's' }),
+        end, { "i", "s" }),
 
-        ['<S-Tab>'] = cmp.mapping(function(fallback)
+        ["<S-Tab>"] = cmp.mapping(function(fallback)
           if cmp.visible() then
             cmp.select_prev_item()
-          elseif require('luasnip').jumpable(-1) then
-            require('luasnip').jump(-1)
+          elseif require("luasnip").jumpable(-1) then
+            require("luasnip").jump(-1)
           else
             fallback()
           end
-        end, { 'i', 's' }),
+        end, { "i", "s" }),
       }),
       sources = cmp.config.sources({
-        { name = 'nvim_lsp' },
-        { name = 'luasnip' }, -- For luasnip users.
+        { name = "nvim_lsp" },
+        { name = "luasnip" },
       }, {
-        { name = 'buffer' },
-      })
+        { name = "buffer" },
+      }),
     })
 
+    -- ===== diagnostics / hover (unchanged) =====
     vim.diagnostic.config({
-      -- update_in_insert = true,
       virtual_text = {
-        prexif = "●",
+        prefix = "●",
         spacing = 4,
         wrap = true,
         max_width = 50,
@@ -187,10 +264,11 @@ return {
         prefix = "",
       },
     })
+
     vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
       border = "rounded",
       max_width = 120,
-      max_height = 58
+      max_height = 58,
     })
   end,
 }
